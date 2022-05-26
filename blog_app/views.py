@@ -5,7 +5,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from .models import Post, Subscribe
-from .serializers import PostCreateSerializer, PostSerializer, SubscribeSerializer
+from .serializers import PostCreateSerializer, PostSerializer, SubscribeSerializer, PostSubscribeSerializer
 from .paginations import MyPagination
 
 
@@ -63,11 +63,12 @@ class DeleteSubscribeUserAPIView(generics.GenericAPIView):
 
 
 class ListSubscribeAPIView(generics.ListAPIView):
-    serializer_class = PostSerializer
+    """
+    List subscribes by user.
+    """
+    serializer_class = PostSubscribeSerializer
     permission_classes = (permissions.IsAuthenticated,)
     pagination_class = MyPagination
 
     def get_queryset(self):
-        subscribers = get_list_or_404(Subscribe.objects.order_by('-post__created_at'), user=self.request.user)
-        subscribers = [subscribe.post for subscribe in subscribers]
-        return subscribers
+        return get_list_or_404(Subscribe.objects.order_by('-post__created_at'), user=self.request.user)

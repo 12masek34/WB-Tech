@@ -18,11 +18,26 @@ class PostSerializer(PostCreateSerializer):
     """
     All fields of post.
     """
+
     class Meta(PostCreateSerializer.Meta):
         fields = ('id',) + PostCreateSerializer.Meta.fields + ('created_at',)
 
 
+class PostSubscribeSerializer(serializers.ModelSerializer):
+    """
+    All subscribe by user.
+    """
+    post = PostSerializer(read_only=True)
+
+    class Meta:
+        model = Subscribe
+        fields = ('id', 'post', 'readed')
+
+
 class SubscribeSerializer(serializers.ModelSerializer):
+    """
+    Subscribe by user.
+    """
     user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:

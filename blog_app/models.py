@@ -15,3 +15,4 @@ class Post(models.Model):
 class Subscribe(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     post = models.OneToOneField(Post, on_delete=models.CASCADE)
+    readed = models.BooleanField(default=False)
