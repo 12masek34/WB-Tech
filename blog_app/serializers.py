@@ -5,7 +5,7 @@ from .models import Post, Subscribe
 
 class PostCreateSerializer(serializers.ModelSerializer):
     """
-    Create post and set user field from request user.
+    Create post.
     """
     user = serializers.PrimaryKeyRelatedField(read_only=True)
 
@@ -14,10 +14,12 @@ class PostCreateSerializer(serializers.ModelSerializer):
         fields = ('title', 'text', 'user')
 
 
-class PostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = ('id', 'title', 'text', 'user')
+class PostSerializer(PostCreateSerializer):
+    """
+    All fields of post.
+    """
+    class Meta(PostCreateSerializer.Meta):
+        fields = ('id',) + PostCreateSerializer.Meta.fields + ('created_at',)
 
 
 class SubscribeSerializer(serializers.ModelSerializer):

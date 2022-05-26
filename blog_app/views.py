@@ -1,3 +1,4 @@
+from django.shortcuts import get_list_or_404
 from rest_framework import generics, permissions, status
 from rest_framework.exceptions import APIException
 from rest_framework.generics import get_object_or_404
@@ -5,6 +6,7 @@ from rest_framework.response import Response
 
 from .models import Post, Subscribe
 from .serializers import PostCreateSerializer, PostSerializer, SubscribeSerializer
+from .paginations import MyPagination
 
 
 class CreatePostAPIView(generics.CreateAPIView):
@@ -51,10 +53,21 @@ class DeleteSubscribeUserAPIView(generics.GenericAPIView):
     serializer_class = SubscribeSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-    def get_object(self, pk: int, user):
-        return get_object_or_404(Subscribe, user=user, post=pk)
+    def get_object(self, post_id: int, user):
+        return get_object_or_404(Subscribe, user=user, post=post_id)
 
-    def delete(self, request, pk):
-        subscribe = self.get_object(pk, request.user)
+    def delete(self, request, post_id: int):
+        subscribe = self.get_object(post_id, request.user)
         subscribe.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ListSubscribeAPIView(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    pagination_class = MyPagination
+
+    def get_queryset(self):
+        subscribers = get_list_or_404(Subscribe.objects.order_by('-post__created_at'), user=self.request.user)
+        subscribers = [subscribe.post for subscribe in subscribers]
+        return subscribers
