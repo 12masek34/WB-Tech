@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Post
+from .models import Post, Subscribe
 
 
 class PostAdmin(admin.ModelAdmin):
@@ -11,4 +11,9 @@ class PostAdmin(admin.ModelAdmin):
                     )
 
 
+class SubscribeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'post')
+
+
 admin.site.register(Post, PostAdmin)
+admin.site.register(Subscribe, SubscribeAdmin)
