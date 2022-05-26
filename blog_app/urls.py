@@ -1,8 +1,9 @@
 from django.urls import path
 
-from .views import CreatePostView, ListAllPosts
+from .views import CreatePostAPIView, ListAllPostsAPIVew, SubscribeUserAPIView
 
 urlpatterns = [
-    path('post/', CreatePostView.as_view()),
-    path('posts/', ListAllPosts.as_view())
+    path('post/', CreatePostAPIView.as_view()),
+    path('posts/', ListAllPostsAPIVew.as_view()),
+    path('subscribe/', SubscribeUserAPIView.as_view()),
 ]

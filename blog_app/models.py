@@ -10,4 +10,8 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
-    
+
+
+class Subscribe(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    post = models.OneToOneField(Post, on_delete=models.CASCADE)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Post
+from .models import Post, Subscribe
 
 
 class PostCreateSerializer(serializers.ModelSerializer):
@@ -15,7 +15,14 @@ class PostCreateSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Post
         fields = ('id', 'title', 'text', 'user')
+
+
+class SubscribeSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Subscribe
+        fields = ('post', 'user')

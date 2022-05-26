@@ -6,7 +6,7 @@ from django.db.models import Count
 from .serializers import UserSerializer, UserCountPostSerializer
 
 
-class CreateUserView(generics.CreateAPIView):
+class CreateUserAPIView(generics.CreateAPIView):
     """
     Registers a user by fields username and password.
     """
@@ -15,7 +15,7 @@ class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
 
 
-class ListUsersView(generics.ListAPIView):
+class ListUsersAPIView(generics.ListAPIView):
     """
     Get all users and added field "count_post".
     Filter by url parameter, example - /1/
