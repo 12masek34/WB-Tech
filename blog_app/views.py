@@ -5,6 +5,9 @@ from .serializers import PostCreateSerializer
 
 
 class CreatePostView(generics.CreateAPIView):
+    """
+    Create post by user.
+    """
     queryset = Post.objects.all()
     serializer_class = PostCreateSerializer
     permission_classes = (permissions.IsAuthenticated,)

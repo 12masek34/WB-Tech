@@ -5,7 +5,9 @@ UserModel = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
-
+    """
+    User serializer.
+    """
     password = serializers.CharField(write_only=True)
 
     def create(self, validated_data) -> UserModel:
@@ -19,3 +21,14 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ('id', 'username', 'password',)
+
+
+class UserCountPostSerializer(UserSerializer):
+    """
+    User serializer expanded by field "count_post".
+    """
+    count_post = serializers.IntegerField()
+
+    class Meta(UserSerializer.Meta):
+        model = UserModel
+        fields = UserSerializer.Meta.fields + ('count_post',)
