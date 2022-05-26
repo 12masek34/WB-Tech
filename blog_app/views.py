@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions
 
 from .models import Post
-from .serializers import PostCreateSerializer
+from .serializers import PostCreateSerializer, PostSerializer
 
 
 class CreatePostView(generics.CreateAPIView):
@@ -14,3 +14,11 @@ class CreatePostView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class ListAllPosts(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        return Post.objects.exclude(user=self.request.user.id).order_by('-created_at')

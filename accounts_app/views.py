@@ -20,7 +20,6 @@ class ListUsersView(generics.ListAPIView):
     Get all users and added field "count_post".
     Filter by url parameter, example - /1/
     """
-    queryset = get_user_model().objects.all()
     permission_classes = (permissions.AllowAny,)
     serializer_class = UserCountPostSerializer
 
