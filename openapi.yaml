@@ -1,0 +1,394 @@
+openapi: 3.0.1
+info:
+  title: Snippets API
+  description: Test description
+  termsOfService: https://www.google.com/policies/terms/
+  contact:
+    email: contact@snippets.local
+  license:
+    name: BSD License
+  version: v1
+servers:
+  - url: http://localhost:8000/api/v1
+security:
+  - Basic: []
+paths:
+  /post/:
+    post:
+      tags:
+        - post
+      description: Create post by user.
+      operationId: post_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+        required: true
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostCreate'
+      x-codegen-request-body-name: data
+  /posts/:
+    get:
+      tags:
+        - posts
+      description: List all posts other users.
+      operationId: posts_list
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+  /registration/:
+    post:
+      tags:
+        - registration
+      description: Registers a user by fields username and password.
+      operationId: registration_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      x-codegen-request-body-name: data
+  /subscribe/:
+    post:
+      tags:
+        - subscribe
+      description: Create subscribe authorized user by pk post.
+      operationId: subscribe_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscribe'
+        required: true
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscribe'
+      x-codegen-request-body-name: data
+  /subscribe/{post_id}/:
+    put:
+      tags:
+        - subscribe
+      description: Update subscribe authorized user by pk post.
+      operationId: subscribe_update
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscribe'
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscribe'
+      x-codegen-request-body-name: data
+    delete:
+      tags:
+        - subscribe
+      description: Delete subscribe authorized user by pk post.
+      operationId: subscribe_delete
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: ''
+          content: {}
+  /subscribers/:
+    get:
+      tags:
+        - subscribers
+      description: List subscribes by user.
+      operationId: subscribers_list
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                required:
+                  - count
+                  - results
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  next:
+                    type: string
+                    format: uri
+                    nullable: true
+                  previous:
+                    type: string
+                    format: uri
+                    nullable: true
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PostSubscribe'
+  /token/:
+    post:
+      tags:
+        - token
+      description: >-
+        Takes a set of user credentials and returns an access and refresh JSON
+        web
+
+        token pair to prove the authentication of those credentials.
+      operationId: token_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+      x-codegen-request-body-name: data
+  /token/refresh/:
+    post:
+      tags:
+        - token
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      operationId: token_refresh_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+      x-codegen-request-body-name: data
+  /users/{count_post}/:
+    get:
+      tags:
+        - users
+      description: |-
+        Get all users and added field "count_post".
+        Filter by url parameter, example - /1/
+      operationId: users_read
+      parameters:
+        - name: count_post
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserCountPost'
+components:
+  schemas:
+    PostCreate:
+      required:
+        - text
+        - title
+      type: object
+      properties:
+        title:
+          title: Title
+          maxLength: 250
+          minLength: 1
+          type: string
+        text:
+          title: Text
+          minLength: 1
+          type: string
+        user:
+          title: User
+          type: integer
+          readOnly: true
+    Post:
+      required:
+        - text
+        - title
+      type: object
+      properties:
+        id:
+          title: ID
+          type: integer
+          readOnly: true
+        title:
+          title: Title
+          maxLength: 250
+          minLength: 1
+          type: string
+        text:
+          title: Text
+          minLength: 1
+          type: string
+        user:
+          title: User
+          type: integer
+          readOnly: true
+        created_at:
+          title: Created at
+          type: string
+          format: date-time
+          readOnly: true
+    User:
+      required:
+        - password
+        - username
+      type: object
+      properties:
+        id:
+          title: ID
+          type: integer
+          readOnly: true
+        username:
+          title: Username
+          maxLength: 150
+          minLength: 1
+          pattern: ^[\w.@+-]+$
+          type: string
+          description: >-
+            Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        password:
+          title: Password
+          minLength: 1
+          type: string
+    Subscribe:
+      type: object
+      properties:
+        post:
+          title: Post
+          type: integer
+          readOnly: true
+        user:
+          title: User
+          type: integer
+          readOnly: true
+        readed:
+          title: Readed
+          type: boolean
+    PostSubscribe:
+      type: object
+      properties:
+        id:
+          title: ID
+          type: integer
+          readOnly: true
+        post:
+          $ref: '#/components/schemas/Post'
+        readed:
+          title: Readed
+          type: boolean
+    TokenObtainPair:
+      required:
+        - password
+        - username
+      type: object
+      properties:
+        username:
+          title: Username
+          minLength: 1
+          type: string
+        password:
+          title: Password
+          minLength: 1
+          type: string
+    TokenRefresh:
+      required:
+        - refresh
+      type: object
+      properties:
+        refresh:
+          title: Refresh
+          minLength: 1
+          type: string
+        access:
+          title: Access
+          minLength: 1
+          type: string
+          readOnly: true
+    UserCountPost:
+      required:
+        - count_post
+        - password
+        - username
+      type: object
+      properties:
+        id:
+          title: ID
+          type: integer
+          readOnly: true
+        username:
+          title: Username
+          maxLength: 150
+          minLength: 1
+          pattern: ^[\w.@+-]+$
+          type: string
+          description: >-
+            Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        password:
+          title: Password
+          minLength: 1
+          type: string
+        count_post:
+          title: Count post
+          type: integer
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
