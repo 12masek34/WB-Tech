@@ -2,6 +2,7 @@ from rest_framework import permissions
 from rest_framework import generics
 from django.contrib.auth import get_user_model
 from django.db.models import Count
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import UserSerializer, UserCountPostSerializer
 
@@ -22,6 +23,8 @@ class ListUsersAPIView(generics.ListAPIView):
     """
     permission_classes = (permissions.AllowAny,)
     serializer_class = UserCountPostSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('count_post',)
 
     def get_queryset(self):
         count_post = self.kwargs.get('count_post')

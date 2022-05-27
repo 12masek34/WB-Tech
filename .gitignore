@@ -1,2 +1,5 @@
 /venv
 /db.sqlite3
+/blog_app/migrations/
+/accounts_app/migrations/
+/logs/
