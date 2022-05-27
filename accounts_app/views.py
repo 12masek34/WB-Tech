@@ -2,6 +2,7 @@ from rest_framework import permissions
 from rest_framework import generics
 from django.contrib.auth import get_user_model
 from django.db.models import Count
+from rest_framework.exceptions import APIException
 
 from .serializers import UserSerializer, UserCountPostSerializer
 
@@ -24,7 +25,10 @@ class ListUsersAPIView(generics.ListAPIView):
     serializer_class = UserCountPostSerializer
 
     def get_queryset(self):
-        count_post = self.request.query_params.get('count_post')
+        try:
+            count_post: int = int(self.request.query_params.get('count_post'))
+        except ValueError:
+            raise APIException('Parameter "count_post" must be integer type.')
 
         if count_post is None:
             return get_user_model().objects.annotate(
