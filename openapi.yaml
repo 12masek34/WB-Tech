@@ -212,20 +212,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenRefresh'
       x-codegen-request-body-name: data
-  /users/{count_post}/:
+  /users/:
     get:
       tags:
         - users
       description: |-
         Get all users and added field "count_post".
-        Filter by url parameter, example - /1/
-      operationId: users_read
-      parameters:
-        - name: count_post
-          in: path
-          required: true
-          schema:
-            type: string
+        Filter by url parameter, example - /?count_post=1
+      operationId: users_list
       responses:
         '200':
           description: ''

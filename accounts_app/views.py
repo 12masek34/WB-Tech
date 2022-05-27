@@ -2,10 +2,7 @@ from rest_framework import permissions
 from rest_framework import generics
 from django.contrib.auth import get_user_model
 from django.db.models import Count
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter
 
-from .filters import CountPostFilter
 from .serializers import UserSerializer, UserCountPostSerializer
 
 
