@@ -1,5 +1,5 @@
 from django.shortcuts import get_list_or_404
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, mixins
 from rest_framework.exceptions import APIException
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -46,9 +46,9 @@ class CreateSubscribeUserAPIView(generics.CreateAPIView):
         serializer.save(user=self.request.user)
 
 
-class DeleteSubscribeUserAPIView(generics.GenericAPIView):
+class DeleteSubscribeUserAPIView(generics.GenericAPIView, mixins.DestroyModelMixin, mixins.UpdateModelMixin):
     """
-    Delete subscribe authorized user by pk post.
+    Delete or update subscribe authorized user by pk post.
     """
     serializer_class = SubscribeSerializer
     permission_classes = (permissions.IsAuthenticated,)
@@ -56,10 +56,27 @@ class DeleteSubscribeUserAPIView(generics.GenericAPIView):
     def get_object(self, post_id: int, user):
         return get_object_or_404(Subscribe, user=user, post=post_id)
 
-    def delete(self, request, post_id: int):
+    def delete(self, request, post_id: int, *args, **kwargs):
+        """
+        Delete subscribe authorized user by pk post.
+        """
         subscribe = self.get_object(post_id, request.user)
         subscribe.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def put(self, request, *args, **kwargs):
+        """
+        Update subscribe authorized user by pk post.
+        """
+        return self.update(request, *args, **kwargs)
+
+    def update(self, request, post_id: int, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object(post_id, request.user)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
 
 class ListSubscribeAPIView(generics.ListAPIView):

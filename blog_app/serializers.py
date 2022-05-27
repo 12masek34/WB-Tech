@@ -39,7 +39,16 @@ class SubscribeSerializer(serializers.ModelSerializer):
     Subscribe by user.
     """
     user = serializers.PrimaryKeyRelatedField(read_only=True)
+    post = serializers.PrimaryKeyRelatedField(read_only=True)
+    readed = serializers.BooleanField(required=False)
 
     class Meta:
         model = Subscribe
-        fields = ('post', 'user')
+        fields = ('post', 'user', 'readed')
+
+    def update(self, instance, validated_data):
+        instance.user = validated_data.get('user', instance.user)
+        instance.post = validated_data.get('post', instance.post)
+        instance.readed = True
+        instance.save()
+        return instance
