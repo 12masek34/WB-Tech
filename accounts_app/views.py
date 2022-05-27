@@ -3,7 +3,9 @@ from rest_framework import generics
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
 
+from .filters import CountPostFilter
 from .serializers import UserSerializer, UserCountPostSerializer
 
 
@@ -19,17 +21,19 @@ class CreateUserAPIView(generics.CreateAPIView):
 class ListUsersAPIView(generics.ListAPIView):
     """
     Get all users and added field "count_post".
-    Filter by url parameter, example - /1/
+    Filter by url parameter, example - /?count_post=1
     """
     permission_classes = (permissions.AllowAny,)
     serializer_class = UserCountPostSerializer
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('count_post',)
 
     def get_queryset(self):
-        count_post = self.kwargs.get('count_post')
+        count_post = self.request.query_params.get('count_post')
 
-        return get_user_model().objects.annotate(
-            count_post=Count('post')
-        ).filter(count_post=count_post)
-
+        if count_post is None:
+            return get_user_model().objects.annotate(
+                count_post=Count('post')
+            )
+        else:
+            return get_user_model().objects.annotate(
+                count_post=Count('post')
+            ).filter(count_post=count_post)
