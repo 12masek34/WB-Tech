@@ -3,6 +3,7 @@ from rest_framework import generics, permissions, status, mixins
 from rest_framework.exceptions import APIException
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from django.db.utils import IntegrityError
 
 from .models import Post, Subscribe
 from .serializers import PostCreateSerializer, PostSerializer, SubscribeSerializer, PostSubscribeSerializer
@@ -43,7 +44,10 @@ class CreateSubscribeUserAPIView(generics.CreateAPIView):
         post = get_object_or_404(Post, id=self.request.data.get('post'))
         if post.user == self.request.user:
             raise APIException('You are the author of this post.')
-        serializer.save(user=self.request.user)
+        try:
+            serializer.save(user=self.request.user, post=post)
+        except IntegrityError:
+            raise APIException('You have already subscribed to this post.')
 
 
 class DeleteSubscribeUserAPIView(generics.GenericAPIView, mixins.DestroyModelMixin, mixins.UpdateModelMixin):
