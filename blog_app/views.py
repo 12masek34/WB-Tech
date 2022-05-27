@@ -1,4 +1,4 @@
-from django.shortcuts import get_list_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, status, mixins
 from rest_framework.exceptions import APIException
 from rest_framework.generics import get_object_or_404
@@ -86,6 +86,8 @@ class ListSubscribeAPIView(generics.ListAPIView):
     serializer_class = PostSubscribeSerializer
     permission_classes = (permissions.IsAuthenticated,)
     pagination_class = MyPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('readed',)
 
     def get_queryset(self):
-        return get_list_or_404(Subscribe.objects.order_by('-post__created_at'), user=self.request.user)
+        return Subscribe.objects.filter(user=self.request.user).order_by('-post__created_at')
