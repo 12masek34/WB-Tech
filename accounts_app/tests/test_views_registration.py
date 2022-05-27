@@ -6,7 +6,7 @@ client = Client()
 
 
 class CreateNewUserTest(TestCase):
-    """ Test module for inserting a new user """
+    """ Test module for inserting a new user API"""
 
     def setUp(self):
         self.valid_payload = {

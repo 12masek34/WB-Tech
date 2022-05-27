@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 
-class PuppyTest(TestCase):
+class UsersTest(TestCase):
     """ Test module for User model """
 
     def setUp(self):

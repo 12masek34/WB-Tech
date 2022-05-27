@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 client = Client()
 
 
-class CreateNewUserTest(TestCase):
-    """ Test module for inserting a new user """
+class GetTokenTest(TestCase):
+    """ Test module for get token API """
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', password='test')
