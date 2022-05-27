@@ -12,7 +12,7 @@ from .paginations import MyPagination
 
 class CreatePostAPIView(generics.CreateAPIView):
     """
-    Create post by user.
+    Create post by authorized user.
     """
     queryset = Post.objects.all()
     serializer_class = PostCreateSerializer

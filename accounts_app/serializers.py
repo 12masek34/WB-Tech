@@ -6,17 +6,20 @@ class UserSerializer(serializers.ModelSerializer):
     """
     User serializer.
     """
-    password = serializers.CharField(write_only=True)
+    password1 = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
 
     def create(self, validated_data):
-        return get_user_model().objects.create_user(
-            username=validated_data['username'],
-            password=validated_data['password'],
-        )
+        if validated_data['password1'] == validated_data['password2']:
+            return get_user_model().objects.create_user(
+                username=validated_data['username'],
+                password=validated_data['password1'],
+            )
+        raise serializers.ValidationError('field password1 must by equal password2.')
 
     class Meta:
         model = get_user_model()
-        fields = ('id', 'username', 'password',)
+        fields = ('id', 'username', 'password1', 'password2')
 
 
 class UserCountPostSerializer(UserSerializer):

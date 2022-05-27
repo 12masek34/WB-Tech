@@ -17,7 +17,7 @@ paths:
     post:
       tags:
         - post
-      description: Create post by user.
+      description: Create post by authorized user.
       operationId: post_create
       requestBody:
         content:
@@ -286,7 +286,8 @@ components:
           readOnly: true
     User:
       required:
-        - password
+        - password1
+        - password2
         - username
       type: object
       properties:
@@ -303,8 +304,12 @@ components:
           description: >-
             Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
-        password:
-          title: Password
+        password1:
+          title: Password1
+          minLength: 1
+          type: string
+        password2:
+          title: Password2
           minLength: 1
           type: string
     Subscribe:
@@ -364,7 +369,8 @@ components:
     UserCountPost:
       required:
         - count_post
-        - password
+        - password1
+        - password2
         - username
       type: object
       properties:
@@ -381,8 +387,12 @@ components:
           description: >-
             Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
-        password:
-          title: Password
+        password1:
+          title: Password1
+          minLength: 1
+          type: string
+        password2:
+          title: Password2
           minLength: 1
           type: string
         count_post:
