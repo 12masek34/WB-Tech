@@ -27,24 +27,31 @@ class CreatePostAPIView(generics.CreateAPIView):
 
 class ListAllPostsAPIVew(generics.ListAPIView):
     """
-    List all posts other users.
+    List all posts. If the user is logged in, it will return all the posts of other users.
     """
     serializer_class = PostSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.AllowAny,)
 
     def get_queryset(self):
+        if self.request.user.is_anonymous:
+            return Post.objects.all().order_by('-created_at')
         return Post.objects.exclude(user=self.request.user.id).order_by('-created_at')
 
 
 class CreateSubscribeUserAPIView(generics.CreateAPIView):
     """
-    Create subscribe authorized user by pk post.
-    Example body: {
-                    "post": 0
-                  }
+    Create subscribe authorized user to another user's post.
     """
     serializer_class = CreateSubscribeSerializer
     permission_classes = (permissions.IsAuthenticated,)
+
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'post': openapi.Schema(type=openapi.TYPE_STRING, description='The id of the post to subscribe to.'),
+        }))
+    def post(self, request, *args, **kwargs):
+        return self.perform_create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         post = get_object_or_404(Post, id=self.request.data.get('post'))
@@ -53,7 +60,7 @@ class CreateSubscribeUserAPIView(generics.CreateAPIView):
         serializer = self.get_serializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return serializer.data
+        return Response(serializer.data)
 
 
 class DeleteSubscribeUserAPIView(generics.GenericAPIView,
