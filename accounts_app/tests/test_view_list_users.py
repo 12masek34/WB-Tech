@@ -14,18 +14,23 @@ class GetAllUsersTest(APITestCase):
     """
 
     def setUp(self):
-        User.objects.create(
-            username='Test1', password='test1')
-        User.objects.create(
-            username='Test2', password='test2')
-        User.objects.create(
-            username='Test3', password='test3')
-        User.objects.create(
-            username='Test4', password='test4')
+        users = [User(username='Test%s' % i, password='password%s' % i) for i in range(15)]
+        User.objects.bulk_create(users)
+
 
     def test_get_all_users(self):
         response = client.get('http://127.0.0.1:8000/api/v1/users/')
         users = User.objects.all().annotate(count_post=Count('post'))
-        serializer = UserCountPostSerializer(users, many=True)
-        self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsInstance(response.json()['results'], list)
+        self.assertIn('id', response.json()['results'][0])
+        self.assertIn('username', response.json()['results'][0])
+        self.assertIn('count_post', response.json()['results'][0])
+
+    def test_pagination(self):
+        response = client.get('http://127.0.0.1:8000/api/v1/users/')
+        self.assertIn('count', response.json())
+        self.assertIn('next', response.json())
+        self.assertIn('previous', response.json())
+        self.assertEqual(len(response.json()['results']), 10)
+

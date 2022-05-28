@@ -54,7 +54,7 @@ class CreateSubscribeTest(APITestCase):
             data=json.dumps(self.subscribe1),
             content_type='application/json'
         )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('post', response.json())
         self.assertIn('user', response.json())
         self.assertEqual(response.json()['post'], self.subscribe1['post'])
@@ -74,8 +74,8 @@ class CreateSubscribeTest(APITestCase):
             data=json.dumps(self.subscribe3),
             content_type='application/json'
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.json(), {'post': ['This field is required.']})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.json(), {'detail': 'Not found.'})
 
     def test_create_subscribe_not_auth(self):
         self.client.logout()
