@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Count
 from rest_framework.exceptions import APIException
 
+from blog_app.paginations import MyPagination
 from .serializers import UserSerializer, UserCountPostSerializer, UserResponseSerializer
 
 
@@ -38,6 +39,7 @@ class ListUsersAPIView(generics.ListAPIView):
     """
     permission_classes = (permissions.AllowAny,)
     serializer_class = UserCountPostSerializer
+    pagination_class = MyPagination
 
     @swagger_auto_schema(
         manual_parameters=[openapi.Parameter('count_post', openapi.IN_QUERY, description='filter by count_post.',
