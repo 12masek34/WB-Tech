@@ -8,7 +8,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
     """
     Create post.
     """
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Post

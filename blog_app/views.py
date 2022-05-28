@@ -21,9 +21,6 @@ class CreatePostAPIView(generics.CreateAPIView):
     serializer_class = PostCreateSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
 
 class ListAllPostsAPIVew(generics.ListAPIView):
     """
@@ -57,12 +54,12 @@ class CreateOrUpdateSubscribeUserAPIView(generics.CreateAPIView, mixins.UpdateMo
         type=openapi.TYPE_OBJECT,
         properties={
             'post': openapi.Schema(type=openapi.TYPE_INTEGER),
-        }),responses={
-            status.HTTP_200_OK: openapi.Response(
-                description="Return id subscribe, post and user.",
-                schema=CreateSubscribeResponseSerializer,
-            )
-        })
+        }), responses={
+        status.HTTP_200_OK: openapi.Response(
+            description="Return id subscribe, post and user.",
+            schema=CreateSubscribeResponseSerializer,
+        )
+    })
     def post(self, request, *args, **kwargs):
         return self.perform_create(request, *args, **kwargs)
 
