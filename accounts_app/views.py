@@ -12,6 +12,7 @@ from .serializers import UserSerializer, UserCountPostSerializer, UserResponseSe
 
 class CreateUserAPIView(generics.CreateAPIView):
     """
+    Registers a new user.\n
     Registers a new user.
     """
     model = get_user_model()

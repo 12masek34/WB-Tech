@@ -9,12 +9,13 @@ from django.db.utils import IntegrityError
 
 from .models import Post, Subscribe
 from .serializers import (PostCreateSerializer, PostSerializer, SubscribeSerializer, PostSubscribeSerializer,
-                          CreateSubscribeSerializer, SubscribeResponseSerializer)
+                          CreateSubscribeSerializer, SubscribeResponseSerializer, CreateSubscribeResponseSerializer)
 from .paginations import MyPagination
 
 
 class CreatePostAPIView(generics.CreateAPIView):
     """
+    Create new post.\n
     Create post by authorized user.
     """
     queryset = Post.objects.all()
@@ -27,6 +28,7 @@ class CreatePostAPIView(generics.CreateAPIView):
 
 class ListAllPostsAPIVew(generics.ListAPIView):
     """
+    List all posts.\n
     List all posts. If the user is logged in, it will return all the posts of other users.
     Sort by post creation date, fresh first.
     """
@@ -41,6 +43,7 @@ class ListAllPostsAPIVew(generics.ListAPIView):
 
 class CreateOrUpdateSubscribeUserAPIView(generics.CreateAPIView, mixins.UpdateModelMixin):
     """
+    Create new subscribe.\n
     Create subscribe authorized user to another user's post.
     """
     permission_classes = (permissions.IsAuthenticated,)
@@ -54,8 +57,13 @@ class CreateOrUpdateSubscribeUserAPIView(generics.CreateAPIView, mixins.UpdateMo
     @swagger_auto_schema(request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            'post': openapi.Schema(type=openapi.TYPE_INTEGER, description='The id of the post to subscribe to.'),
-        }))
+            'post': openapi.Schema(type=openapi.TYPE_INTEGER),
+        }),responses={
+            status.HTTP_200_OK: openapi.Response(
+                description="Return id subscribe, post and user.",
+                schema=CreateSubscribeResponseSerializer,
+            )
+        })
     def post(self, request, *args, **kwargs):
         return self.perform_create(request, *args, **kwargs)
 
@@ -68,16 +76,21 @@ class CreateOrUpdateSubscribeUserAPIView(generics.CreateAPIView, mixins.UpdateMo
         serializer.save()
         return Response(serializer.data)
 
-    @swagger_auto_schema(
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'post': openapi.Schema(type=openapi.TYPE_INTEGER, description='Id of the selected post'),
+        }),
         responses={
             status.HTTP_200_OK: openapi.Response(
                 description="response description",
-                schema=SubscribeResponseSerializer,
+                schema=SubscribeSerializer,
             )
         }
     )
     def patch(self, request, *args, **kwargs):
         """
+        Marks the post as read.\n
         Update subscribe authorized user by pk post.
         """
         return self.update(request, *args, **kwargs)
@@ -96,7 +109,7 @@ class CreateOrUpdateSubscribeUserAPIView(generics.CreateAPIView, mixins.UpdateMo
 
 class DeleteSubscribeUserAPIView(generics.GenericAPIView, mixins.DestroyModelMixin):
     """
-    Delete or update subscribe authorized user by pk post.
+    Delete subscribe authorized user by pk post.
     """
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -105,6 +118,7 @@ class DeleteSubscribeUserAPIView(generics.GenericAPIView, mixins.DestroyModelMix
 
     def delete(self, request, post_id: int, *args, **kwargs):
         """
+        Delete subscribe.\n
         Delete subscribe authorized user by pk post in url parameter.
         Exampl url: http://127.0.0.1:8000/api/v1/subscribe/1/
         """
@@ -129,6 +143,7 @@ class DeleteSubscribeUserAPIView(generics.GenericAPIView, mixins.DestroyModelMix
 
 class ListSubscribeAPIView(generics.ListAPIView):
     """
+    List all posts by subscribers.\n
     List subscribes by user.Sort by post creation date, fresh first.
     """
     serializer_class = PostSubscribeSerializer
