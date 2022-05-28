@@ -1,5 +1,4 @@
 from drf_yasg import openapi
-from drf_yasg.openapi import Schema
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import permissions, status
 from rest_framework import generics
