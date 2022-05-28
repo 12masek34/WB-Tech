@@ -17,6 +17,7 @@ paths:
     post:
       tags:
         - post
+      summary: Create new post.
       description: Create post by authorized user.
       operationId: post_create
       requestBody:
@@ -37,7 +38,12 @@ paths:
     get:
       tags:
         - posts
-      description: List all posts other users.
+      summary: List all posts.
+      description: >-
+        List all posts. If the user is logged in, it will return all the posts
+        of other users.
+
+        Sort by post creation date, fresh first.
       operationId: posts_list
       responses:
         '200':
@@ -52,7 +58,8 @@ paths:
     post:
       tags:
         - registration
-      description: Registers a user by fields username and password.
+      summary: Registers a new user.
+      description: Registers a new user.
       operationId: registration_create
       requestBody:
         content:
@@ -61,63 +68,69 @@ paths:
               $ref: '#/components/schemas/User'
         required: true
       responses:
-        '201':
-          description: ''
+        '200':
+          description: response description
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserResponse'
       x-codegen-request-body-name: data
   /subscribe/:
     post:
       tags:
         - subscribe
-      description: Create subscribe authorized user by pk post.
+      summary: Create new subscribe.
+      description: Create subscribe authorized user to another user's post.
       operationId: subscribe_create
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Subscribe'
+              type: object
+              properties:
+                post:
+                  type: integer
         required: true
       responses:
-        '201':
-          description: ''
+        '200':
+          description: Return id subscribe, post and user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSubscribeResponse'
+      x-codegen-request-body-name: data
+    patch:
+      tags:
+        - subscribe
+      summary: Marks the post as read.
+      description: Update subscribe authorized user by pk post.
+      operationId: subscribe_partial_update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                post:
+                  type: integer
+                  description: Id of the selected post
+        required: true
+      responses:
+        '200':
+          description: response description
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Subscribe'
       x-codegen-request-body-name: data
   /subscribe/{post_id}/:
-    put:
-      tags:
-        - subscribe
-      description: Update subscribe authorized user by pk post.
-      operationId: subscribe_update
-      parameters:
-        - name: post_id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Subscribe'
-        required: true
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Subscribe'
-      x-codegen-request-body-name: data
     delete:
       tags:
         - subscribe
-      description: Delete subscribe authorized user by pk post.
+      summary: Delete subscribe.
+      description: |-
+        Delete subscribe authorized user by pk post in url parameter.
+        Exampl url: http://127.0.0.1:8000/api/v1/subscribe/1/
       operationId: subscribe_delete
       parameters:
         - name: post_id
@@ -133,7 +146,8 @@ paths:
     get:
       tags:
         - subscribers
-      description: List subscribes by user.
+      summary: All posts from subscribers' feed
+      description: List subscribes by user.Sort by post creation date, fresh first.
       operationId: subscribers_list
       parameters:
         - name: page
@@ -141,6 +155,11 @@ paths:
           description: A page number within the paginated result set.
           schema:
             type: integer
+        - name: readed
+          in: query
+          description: filter by readed.
+          schema:
+            type: boolean
       responses:
         '200':
           description: ''
@@ -216,10 +235,15 @@ paths:
     get:
       tags:
         - users
-      description: |-
-        Get all users and added field "count_post".
-        Filter by url parameter, example - /?count_post=1
+      summary: All users.
+      description: Get all users and filter count posts.
       operationId: users_list
+      parameters:
+        - name: count_post
+          in: query
+          description: filter by count_post.
+          schema:
+            type: number
       responses:
         '200':
           description: ''
@@ -237,6 +261,10 @@ components:
         - title
       type: object
       properties:
+        id:
+          title: ID
+          type: integer
+          readOnly: true
         title:
           title: Title
           maxLength: 250
@@ -306,17 +334,52 @@ components:
           title: Password2
           minLength: 1
           type: string
-    Subscribe:
+    UserResponse:
+      required:
+        - username
       type: object
       properties:
+        id:
+          title: ID
+          type: integer
+          readOnly: true
+        username:
+          title: Username
+          maxLength: 150
+          minLength: 1
+          pattern: ^[\w.@+-]+$
+          type: string
+          description: >-
+            Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+    CreateSubscribeResponse:
+      required:
+        - post
+        - user
+      type: object
+      properties:
+        id:
+          title: ID
+          type: integer
+          readOnly: true
         post:
           title: Post
           type: integer
-          readOnly: true
         user:
           title: User
           type: integer
+    Subscribe:
+      type: object
+      properties:
+        id:
+          title: ID
+          type: integer
           readOnly: true
+        post:
+          $ref: '#/components/schemas/Post'
+        user:
+          title: User
+          type: integer
         readed:
           title: Readed
           type: boolean
@@ -363,8 +426,6 @@ components:
     UserCountPost:
       required:
         - count_post
-        - password1
-        - password2
         - username
       type: object
       properties:
@@ -381,14 +442,6 @@ components:
           description: >-
             Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
-        password1:
-          title: Password1
-          minLength: 1
-          type: string
-        password2:
-          title: Password2
-          minLength: 1
-          type: string
         count_post:
           title: Count post
           type: integer
