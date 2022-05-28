@@ -31,3 +31,9 @@ class UserCountPostSerializer(UserSerializer):
     class Meta(UserSerializer.Meta):
         model = get_user_model()
         fields = ('id', 'username', 'count_post',)
+
+
+class UserResponseSerializer(serializers.ModelSerializer):
+    class Meta(UserSerializer.Meta):
+        model = get_user_model()
+        fields = ('id', 'username')

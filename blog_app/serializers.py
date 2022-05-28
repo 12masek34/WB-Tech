@@ -12,7 +12,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('title', 'text', 'user')
+        fields = ('id', 'title', 'text', 'user')
 
 
 class PostSerializer(PostCreateSerializer):
@@ -60,17 +60,24 @@ class SubscribeSerializer(serializers.ModelSerializer):
     """
     Subscribe by user.
     """
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
-    post = serializers.PrimaryKeyRelatedField(read_only=True)
-    readed = serializers.BooleanField(required=False)
+    # user = serializers.PrimaryKeyRelatedField(read_only=True)
+    # user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), default=serializers.CurrentUserDefault())
+    # post = serializers.PrimaryKeyRelatedField(read_only=True)
+    # readed = serializers.BooleanField(write_only=True)
 
     class Meta:
         model = Subscribe
-        fields = ('readed', 'user', 'post')
+        fields = ('post',)
 
     def update(self, instance, validated_data):
-        instance.user = validated_data.get('user', instance.user)
-        instance.post = validated_data.get('post', instance.post)
+        # instance.user = validated_data.get('user', instance.user)
+        # instance.post = validated_data.get('post', instance.post)
         instance.readed = True
         instance.save()
         return instance
+
+
+class SubscribeResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscribe
+        fields = ('user', 'post', 'readed')
