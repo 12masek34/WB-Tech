@@ -34,7 +34,7 @@ class CreatePostAPIView(generics.CreateAPIView):
         )
     })
     def post(self, request, *args, **kwargs):
-        return self.perform_create(request, *args, **kwargs)
+        return self.create(request, *args, **kwargs)
 
 
 class ListAllPostsAPIVew(generics.ListAPIView):
