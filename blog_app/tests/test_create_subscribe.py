@@ -13,7 +13,7 @@ class CreateSubscribeTest(APITestCase):
     """
 
     def setUp(self):
-        User.objects.create_user(username='test', password='test')
+        self.user = User.objects.create_user(username='test', password='test')
         self.client = APIClient()
 
         self.login = {
@@ -39,11 +39,51 @@ class CreateSubscribeTest(APITestCase):
         User.objects.bulk_create(users)
         Post.objects.bulk_create(posts)
 
+        self.subscribe1 = {
+            'post': 2
+        }
 
-    def test_create_valid_post(self):
+        self.subscribe2 = {
+            'post': 5
+        }
+        self.subscribe3 = {}
+
+    def test_create_subscribe(self):
         response = self.client.post(
             'http://127.0.0.1:8000/api/v1/subscribe/',
-            data=json.dumps(self.valid_post),
+            data=json.dumps(self.subscribe1),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn('post', response.json())
+        self.assertIn('user', response.json())
+        self.assertEqual(response.json()['post'], self.subscribe1['post'])
+        self.assertEqual(response.json()['user'], self.user.id)
+
+        bad_response = self.client.post(
+            'http://127.0.0.1:8000/api/v1/subscribe/',
+            data=json.dumps(self.subscribe1),
+            content_type='application/json'
+        )
+        self.assertEqual(bad_response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(bad_response.json(), {'non_field_errors': ['The fields user, post must make a unique set.']})
+
+    def test_create_subscribe_invalid(self):
+        response = self.client.post(
+            'http://127.0.0.1:8000/api/v1/subscribe/',
+            data=json.dumps(self.subscribe3),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.json(), {'post': ['This field is required.']})
+
+    def test_create_subscribe_not_auth(self):
+        self.client.logout()
+        response = self.client.post(
+            'http://127.0.0.1:8000/api/v1/subscribe/',
+            data=json.dumps(self.subscribe2),
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.json(), {'detail': 'Authentication credentials were not provided.'})
