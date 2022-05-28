@@ -25,16 +25,17 @@ class ListUsersAPIView(generics.ListAPIView):
     serializer_class = UserCountPostSerializer
 
     def get_queryset(self):
-        try:
-            count_post: int = int(self.request.query_params.get('count_post'))
-        except ValueError:
-            raise APIException('Parameter "count_post" must be integer type.')
+
+        count_post = self.request.query_params.get('count_post')
 
         if count_post is None:
             return get_user_model().objects.annotate(
                 count_post=Count('post')
             )
         else:
-            return get_user_model().objects.annotate(
-                count_post=Count('post')
-            ).filter(count_post=count_post)
+            try:
+                return get_user_model().objects.annotate(
+                    count_post=Count('post')
+                ).filter(count_post=count_post)
+            except ValueError:
+                raise APIException('Parameter "count_post" must be nuber.')
