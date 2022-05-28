@@ -24,11 +24,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostCreate'
+              type: object
+              properties:
+                title:
+                  type: integer
+                  description: 'type: string, title: Title, maxLength: 250, minLength: 1'
+                text:
+                  type: integer
+                  description: 'type: string, title: Text, minLength: 1'
         required: true
       responses:
-        '201':
-          description: ''
+        '200':
+          description: Return all fields created post.
           content:
             application/json:
               schema:
@@ -130,7 +137,7 @@ paths:
       summary: Delete subscribe.
       description: |-
         Delete subscribe authorized user by pk post in url parameter.
-        Exampl url: http://127.0.0.1:8000/api/v1/subscribe/1/
+        Example url: http://127.0.0.1:8000/api/v1/subscribe/1/
       operationId: subscribe_delete
       parameters:
         - name: post_id
@@ -239,6 +246,11 @@ paths:
       description: Get all users and filter count posts.
       operationId: users_list
       parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
         - name: count_post
           in: query
           description: filter by count_post.
@@ -250,9 +262,25 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserCountPost'
+                required:
+                  - count
+                  - results
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  next:
+                    type: string
+                    format: uri
+                    nullable: true
+                  previous:
+                    type: string
+                    format: uri
+                    nullable: true
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserCountPost'
 components:
   schemas:
     PostCreate:
@@ -277,7 +305,6 @@ components:
         user:
           title: User
           type: integer
-          readOnly: true
     Post:
       required:
         - text
@@ -300,7 +327,6 @@ components:
         user:
           title: User
           type: integer
-          readOnly: true
         created_at:
           title: Created at
           type: string

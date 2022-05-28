@@ -21,6 +21,21 @@ class CreatePostAPIView(generics.CreateAPIView):
     serializer_class = PostCreateSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'title': openapi.Schema(type=openapi.TYPE_INTEGER,
+                                    description='type: string, title: Title, maxLength: 250, minLength: 1'),
+            'text': openapi.Schema(type=openapi.TYPE_INTEGER, description='type: string, title: Text, minLength: 1'),
+        }), responses={
+        status.HTTP_200_OK: openapi.Response(
+            description="Return all fields created post.",
+            schema=PostCreateSerializer,
+        )
+    })
+    def post(self, request, *args, **kwargs):
+        return self.perform_create(request, *args, **kwargs)
+
 
 class ListAllPostsAPIVew(generics.ListAPIView):
     """
