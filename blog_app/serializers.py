@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from .models import Post, Subscribe
@@ -32,6 +33,27 @@ class PostSubscribeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscribe
         fields = ('id', 'post', 'readed')
+
+
+class CreateSubscribeSerializer(serializers.ModelSerializer):
+    """
+    Create subscribe serializer.
+    """
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = Subscribe
+        fields = ('post', 'user')
+
+    def create(self, validated_data):
+        user = validated_data.pop('user')
+        post = validated_data.pop('post')
+        instance = Subscribe.objects.create(
+            user=user,
+            post=post,
+            **validated_data
+        )
+        return instance
 
 
 class SubscribeSerializer(serializers.ModelSerializer):

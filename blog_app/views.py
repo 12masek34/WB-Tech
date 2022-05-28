@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from django.db.utils import IntegrityError
 
 from .models import Post, Subscribe
-from .serializers import PostCreateSerializer, PostSerializer, SubscribeSerializer, PostSubscribeSerializer
+from .serializers import (PostCreateSerializer, PostSerializer, SubscribeSerializer, PostSubscribeSerializer,
+                          CreateSubscribeSerializer)
 from .paginations import MyPagination
 
 
@@ -37,17 +38,17 @@ class CreateSubscribeUserAPIView(generics.CreateAPIView):
     """
     Create subscribe authorized user by pk post.
     """
-    serializer_class = SubscribeSerializer
+    serializer_class = CreateSubscribeSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
         post = get_object_or_404(Post, id=self.request.data.get('post'))
         if post.user == self.request.user:
             raise APIException('You are the author of this post.')
-        try:
-            serializer.save(user=self.request.user, post=post)
-        except IntegrityError:
-            raise APIException('You have already subscribed to this post.')
+        serializer = self.get_serializer(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return serializer.data
 
 
 class DeleteSubscribeUserAPIView(generics.GenericAPIView, mixins.DestroyModelMixin, mixins.UpdateModelMixin):
