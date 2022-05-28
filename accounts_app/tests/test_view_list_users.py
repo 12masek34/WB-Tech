@@ -1,15 +1,16 @@
 from rest_framework import status
-from django.test import TestCase, Client
+from rest_framework.test import APIClient, APITestCase
 from django.contrib.auth.models import User
 from django.db.models import Count
 
 from accounts_app.serializers import UserCountPostSerializer
 
-client = Client()
+client = APIClient()
 
 
-class GetAllUsersTest(TestCase):
+class GetAllUsersTest(APITestCase):
     """ Test module for GET all users API """
+
     def setUp(self):
         User.objects.create(
             username='Test1', password='test1')

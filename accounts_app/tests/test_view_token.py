@@ -1,12 +1,12 @@
 import json
 from rest_framework import status
-from django.test import TestCase, Client
+from rest_framework.test import APIClient, APITestCase
 from django.contrib.auth.models import User
 
-client = Client()
+client = APIClient()
 
 
-class GetTokenTest(TestCase):
+class GetTokenTest(APITestCase):
     """ Test module for get token API """
 
     def setUp(self):

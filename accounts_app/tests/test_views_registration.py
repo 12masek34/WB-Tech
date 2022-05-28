@@ -1,11 +1,11 @@
 import json
 from rest_framework import status
-from django.test import TestCase, Client
+from rest_framework.test import APIClient, APITestCase
 
-client = Client()
+client = APIClient()
 
 
-class CreateNewUserTest(TestCase):
+class CreateNewUserTest(APITestCase):
     """ Test module for inserting a new user API"""
 
     def setUp(self):

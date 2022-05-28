@@ -1,14 +1,14 @@
 from rest_framework import status
-from django.test import TestCase, Client
+from rest_framework.test import APIClient, APITestCase
 from django.contrib.auth.models import User
 from django.db.models import Count
 
 from accounts_app.serializers import UserCountPostSerializer
 
-client = Client()
+client = APIClient()
 
 
-class GetAllUsersWithFilterTest(TestCase):
+class GetAllUsersWithFilterTest(APITestCase):
     """ Test module for GET all users with filter API """
 
     def setUp(self):

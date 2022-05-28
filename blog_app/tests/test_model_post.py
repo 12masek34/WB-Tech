@@ -22,13 +22,11 @@ class PostsTest(TestCase):
         post2 = Post.objects.get(title='title2')
         user2 = User.objects.get(username='Test2')
 
-        self.assertEqual(post1.id, 1)
         self.assertEqual(post1.title, 'title1')
         self.assertEqual(post1.text, 'text1')
         self.assertIsInstance(post1.created_at, datetime.datetime)
         self.assertEqual(post1.user, user1)
 
-        self.assertEqual(post2.id, 2)
         self.assertEqual(post2.title, 'title2')
         self.assertEqual(post2.text, 'text2')
         self.assertIsInstance(post2.created_at, datetime.datetime)
