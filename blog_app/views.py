@@ -116,25 +116,11 @@ class DeleteSubscribeUserAPIView(generics.GenericAPIView, mixins.DestroyModelMix
         """
         Delete subscribe.\n
         Delete subscribe authorized user by pk post in url parameter.
-        Exampl url: http://127.0.0.1:8000/api/v1/subscribe/1/
+        Example url: http://127.0.0.1:8000/api/v1/subscribe/1/
         """
         subscribe = self.get_object(post_id, request.user)
         subscribe.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    # def patch(self, request, *args, **kwargs):
-    #     """
-    #     Update subscribe authorized user by pk post.
-    #     """
-    #     return self.update(request, *args, **kwargs)
-    #
-    # def update(self, request, post_id: int, *args, **kwargs):
-    #     partial = kwargs.pop('partial', False)
-    #     instance = self.get_object(post_id, request.user)
-    #     serializer = SubscribeSerializer(instance, data=request.data, partial=partial)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_update(serializer)
-    #     return Response(serializer.data)
 
 
 class ListSubscribeAPIView(generics.ListAPIView):
