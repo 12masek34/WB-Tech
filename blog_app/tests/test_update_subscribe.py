@@ -35,20 +35,20 @@ class UpdateSubscribeTest(APITestCase):
         post1 = Post.objects.create(title='title1', text='text1', user=self.user)
         post2 = Post.objects.create(title='title2', text='text2', user=user2)
 
-        Subscribe.objects.create(user=self.user, post=post2)
+        self.subscribe = Subscribe.objects.create(user=self.user, post=post2)
         Subscribe.objects.create(user=user2, post=post1)
 
-        self.post1 = {
-            'post': 47
+        self.post = {
+            'post': post2.id
         }
 
     def test_update_subscribe(self):
-        subscribe = Subscribe.objects.filter(post__id=47)
-        readed = subscribe[0].readed
+        subscribe = Subscribe.objects.get(id=self.subscribe.id)
+        readed = subscribe.readed
 
         response = self.client.patch(
             'http://127.0.0.1:8000/api/v1/subscribe/',
-            data=json.dumps(self.post1),
+            data=json.dumps(self.post),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -50,6 +50,15 @@ class ListPostsTest(APITestCase):
         self.assertIn('user', response.json()[0])
         self.assertIn('created_at', response.json()[0])
 
+    def test_list_post_ordering(self):
+        response = self.client.get(
+            'http://127.0.0.1:8000/api/v1/posts/')
+
+        posts = Post.objects.all().order_by('-created_at')
+        self.assertEqual(posts[0].id, response.json()[0]['id'])
+        self.assertEqual(posts[5].id, response.json()[5]['id'])
+        self.assertEqual(posts[9].id, response.json()[9]['id'])
+
         user_ids = []
         for i in response.json():
             user_ids.append(i['user'])
