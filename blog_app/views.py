@@ -3,6 +3,8 @@ from rest_framework import generics, permissions, status, mixins
 from rest_framework.exceptions import APIException
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from django.db.utils import IntegrityError
 
 from .models import Post, Subscribe
@@ -37,6 +39,9 @@ class ListAllPostsAPIVew(generics.ListAPIView):
 class CreateSubscribeUserAPIView(generics.CreateAPIView):
     """
     Create subscribe authorized user by pk post.
+    Example body: {
+                    "post": 0
+                  }
     """
     serializer_class = CreateSubscribeSerializer
     permission_classes = (permissions.IsAuthenticated,)
@@ -51,11 +56,11 @@ class CreateSubscribeUserAPIView(generics.CreateAPIView):
         return serializer.data
 
 
-class DeleteSubscribeUserAPIView(generics.GenericAPIView, mixins.DestroyModelMixin, mixins.UpdateModelMixin):
+class DeleteSubscribeUserAPIView(generics.GenericAPIView,
+                                 mixins.DestroyModelMixin, mixins.UpdateModelMixin):
     """
     Delete or update subscribe authorized user by pk post.
     """
-    serializer_class = SubscribeSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_object(self, post_id: int, user):
@@ -64,12 +69,14 @@ class DeleteSubscribeUserAPIView(generics.GenericAPIView, mixins.DestroyModelMix
     def delete(self, request, post_id: int, *args, **kwargs):
         """
         Delete subscribe authorized user by pk post.
+        Exampl url: http://127.0.0.1:8000/api/v1/subscribe/1/
         """
         subscribe = self.get_object(post_id, request.user)
         subscribe.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def put(self, request, *args, **kwargs):
+    @swagger_auto_schema()
+    def patch(self, request, *args, **kwargs):
         """
         Update subscribe authorized user by pk post.
         """
@@ -78,7 +85,7 @@ class DeleteSubscribeUserAPIView(generics.GenericAPIView, mixins.DestroyModelMix
     def update(self, request, post_id: int, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object(post_id, request.user)
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer = SubscribeSerializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)

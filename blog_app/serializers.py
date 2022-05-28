@@ -66,7 +66,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subscribe
-        fields = ('post', 'user', 'readed')
+        fields = ('readed', 'user', 'post')
 
     def update(self, instance, validated_data):
         instance.user = validated_data.get('user', instance.user)
