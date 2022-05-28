@@ -48,7 +48,7 @@ class CreateSubscribeUserAPIView(generics.CreateAPIView):
     @swagger_auto_schema(request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            'post': openapi.Schema(type=openapi.TYPE_STRING, description='The id of the post to subscribe to.'),
+            'post': openapi.Schema(type=openapi.TYPE_INTEGER, description='The id of the post to subscribe to.'),
         }))
     def post(self, request, *args, **kwargs):
         return self.perform_create(request, *args, **kwargs)

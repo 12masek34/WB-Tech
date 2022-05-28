@@ -30,4 +30,4 @@ class UserCountPostSerializer(UserSerializer):
 
     class Meta(UserSerializer.Meta):
         model = get_user_model()
-        fields = UserSerializer.Meta.fields + ('count_post',)
+        fields = ('id', 'username', 'count_post',)
