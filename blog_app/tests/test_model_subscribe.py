@@ -5,7 +5,9 @@ from ..models import Post, Subscribe
 
 
 class PostsTest(TestCase):
-    """ Test module for Subscribe model """
+    """
+    Test module for Subscribe model
+    """
 
     def setUp(self):
         user1 = User.objects.create(username='Test1', password='test1')

@@ -7,7 +7,9 @@ client = APIClient()
 
 
 class GetTokenTest(APITestCase):
-    """ Test module for get token API """
+    """
+    Test module for get token API
+    """
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', password='test')

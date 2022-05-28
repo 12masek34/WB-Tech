@@ -9,7 +9,9 @@ client = APIClient()
 
 
 class GetAllUsersTest(APITestCase):
-    """ Test module for GET all users API """
+    """
+    Test module for GET all users API
+    """
 
     def setUp(self):
         User.objects.create(

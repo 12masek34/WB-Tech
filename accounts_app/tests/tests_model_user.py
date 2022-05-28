@@ -3,7 +3,9 @@ from django.test import TestCase
 
 
 class UsersTest(TestCase):
-    """ Test module for User model """
+    """
+    Test module for User model
+    """
 
     def setUp(self):
         User.objects.create_user(username='Test1', password='test1')

@@ -6,7 +6,9 @@ from rest_framework.test import APIClient, APITestCase
 
 
 class CreateNewPostTest(APITestCase):
-    ''' Test module for inserting a new post API'''
+    """"
+    Test module for inserting a new post API
+    """
 
     def setUp(self):
         User.objects.create_user(username='test', password='test')

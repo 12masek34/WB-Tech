@@ -6,7 +6,9 @@ client = APIClient()
 
 
 class CreateNewUserTest(APITestCase):
-    """ Test module for inserting a new user API"""
+    """
+    Test module for inserting a new user API
+    """
 
     def setUp(self):
         self.valid_payload = {
@@ -33,6 +35,14 @@ class CreateNewUserTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.json()['username'], self.valid_payload['username'])
+
+        response = client.post(
+            'http://127.0.0.1:8000/api/v1/registration/',
+            data=json.dumps(self.valid_payload),
+            content_type='application/json'
+        )
+        self.assertEqual(response.json(), {'username': ['A user with that username already exists.']})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_invalid_username(self):
         response = client.post(

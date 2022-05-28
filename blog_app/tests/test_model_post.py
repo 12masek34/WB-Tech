@@ -7,7 +7,9 @@ from ..models import Post
 
 
 class PostsTest(TestCase):
-    """ Test module for Post model """
+    """
+    Test module for Post model
+    """
 
     def setUp(self):
         user1 = User.objects.create(username='Test1', password='test1')
