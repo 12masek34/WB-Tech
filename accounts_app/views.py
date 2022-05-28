@@ -33,7 +33,8 @@ class CreateUserAPIView(generics.CreateAPIView):
 
 class ListUsersAPIView(generics.ListAPIView):
     """
-    Get all users.
+     All users.\n
+    Get all users and filter count posts.
     """
     permission_classes = (permissions.AllowAny,)
     serializer_class = UserCountPostSerializer

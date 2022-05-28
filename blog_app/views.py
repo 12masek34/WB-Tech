@@ -143,7 +143,7 @@ class DeleteSubscribeUserAPIView(generics.GenericAPIView, mixins.DestroyModelMix
 
 class ListSubscribeAPIView(generics.ListAPIView):
     """
-    List all posts by subscribers.\n
+    All posts from subscribers' feed\n
     List subscribes by user.Sort by post creation date, fresh first.
     """
     serializer_class = PostSubscribeSerializer
