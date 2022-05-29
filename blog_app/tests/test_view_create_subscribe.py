@@ -37,14 +37,14 @@ class CreateSubscribeTest(APITestCase):
             post.user = users[posts.index(post)]
 
         User.objects.bulk_create(users)
-        Post.objects.bulk_create(posts)
+        posts = Post.objects.bulk_create(posts)
 
         self.subscribe1 = {
-            'post': 2
+            'post': posts[0].id
         }
 
         self.subscribe2 = {
-            'post': 5
+            'post': posts[1].id
         }
         self.subscribe3 = {}
 

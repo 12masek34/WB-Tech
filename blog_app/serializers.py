@@ -73,7 +73,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
 
 class SubscribeResponseSerializer(serializers.ModelSerializer):
     """
-    only for the  openapi scheme.
+    Only for the  openapi scheme.
     """
     class Meta:
         model = Subscribe
@@ -82,7 +82,7 @@ class SubscribeResponseSerializer(serializers.ModelSerializer):
 
 class CreateSubscribeResponseSerializer(serializers.ModelSerializer):
     """
-    only for the  openapi scheme.
+    Only for the  openapi scheme.
     """
     class Meta:
         model = Subscribe

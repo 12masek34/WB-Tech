@@ -34,6 +34,9 @@ class UserCountPostSerializer(UserSerializer):
 
 
 class UserResponseSerializer(serializers.ModelSerializer):
+    """
+     Only for the  openapi scheme.
+    """
     class Meta(UserSerializer.Meta):
         model = get_user_model()
         fields = ('id', 'username')

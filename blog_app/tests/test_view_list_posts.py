@@ -43,6 +43,7 @@ class ListPostsTest(APITestCase):
         response = self.client.get(
             'http://127.0.0.1:8000/api/v1/posts/')
 
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsInstance(response.json(), list)
         self.assertIn('id', response.json()[0])
         self.assertIn('title', response.json()[0])
@@ -55,6 +56,7 @@ class ListPostsTest(APITestCase):
             'http://127.0.0.1:8000/api/v1/posts/')
 
         posts = Post.objects.all().order_by('-created_at')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(posts[0].id, response.json()[0]['id'])
         self.assertEqual(posts[5].id, response.json()[5]['id'])
         self.assertEqual(posts[9].id, response.json()[9]['id'])

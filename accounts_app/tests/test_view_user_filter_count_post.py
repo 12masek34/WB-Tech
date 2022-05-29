@@ -3,7 +3,6 @@ from rest_framework.test import APIClient, APITestCase
 from django.contrib.auth.models import User
 from django.db.models import Count
 
-from accounts_app.serializers import UserCountPostSerializer
 
 client = APIClient()
 
