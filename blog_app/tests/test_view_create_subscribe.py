@@ -31,20 +31,15 @@ class CreateSubscribeTest(APITestCase):
 
         users = [User(username='Test%s' % i, password='password%s' % i) for i in range(10)]
 
-        posts = [Post(title='Test%s' % i, text='password%s' % i) for i in range(10)]
-
-        for post in posts:
-            post.user = users[posts.index(post)]
 
         User.objects.bulk_create(users)
-        posts = Post.objects.bulk_create(posts)
 
         self.subscribe1 = {
-            'post': posts[0].id
+            'user_to': users[0].id
         }
 
         self.subscribe2 = {
-            'post': posts[1].id
+            'user_to': users[1].id
         }
         self.subscribe3 = {}
 
@@ -55,9 +50,9 @@ class CreateSubscribeTest(APITestCase):
             content_type='application/json'
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn('post', response.json())
+        self.assertIn('user_to', response.json())
         self.assertIn('user', response.json())
-        self.assertEqual(response.json()['post'], self.subscribe1['post'])
+        self.assertEqual(response.json()['user_to'], self.subscribe1['user_to'])
         self.assertEqual(response.json()['user'], self.user.id)
 
         bad_response = self.client.post(
@@ -66,7 +61,7 @@ class CreateSubscribeTest(APITestCase):
             content_type='application/json'
         )
         self.assertEqual(bad_response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(bad_response.json(), {'non_field_errors': ['The fields user, post must make a unique set.']})
+        self.assertEqual(bad_response.json(), {'non_field_errors': ['The fields user, user_to must make a unique set.']})
 
     def test_create_subscribe_invalid(self):
         response = self.client.post(

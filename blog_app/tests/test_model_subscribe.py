@@ -10,22 +10,15 @@ class SubscribeTest(TestCase):
     """
 
     def setUp(self):
-        user1 = User.objects.create(username='Test1', password='test1')
-        user2 = User.objects.create(username='Test2', password='test2')
+        users = [User(username='Test%s' % i, password='test%s' % i) for i in range(10)]
+        users = User.objects.bulk_create(users)
 
-        post1 = Post.objects.create(title='title1', text='text1', user=user1)
-        post2 = Post.objects.create(title='title2', text='text2', user=user2)
-
-        Subscribe.objects.create(user=user1, post=post2)
-        Subscribe.objects.create(user=user2, post=post1)
+        Subscribe.objects.create(user=users[0], user_to=users[1])
+        Subscribe.objects.create(user=users[1], user_to=users[0])
+        Subscribe.objects.create(user=users[2], user_to=users[1])
 
     def test_subscribe(self):
         subscribe1 = Subscribe.objects.first()
 
-        user1 = User.objects.get(username='Test1')
-
-        post2 = Post.objects.get(title='title2')
-
-        self.assertEqual(subscribe1.user, user1)
-        self.assertEqual(subscribe1.post, post2)
-        self.assertFalse(subscribe1.readed)
+        self.assertIsInstance(subscribe1.user, User)
+        self.assertIsInstance(subscribe1.user_to, User)

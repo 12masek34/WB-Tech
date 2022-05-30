@@ -29,20 +29,19 @@ class DeleteSubscribeTest(APITestCase):
 
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token.json()['access'])
 
-        user2 = User.objects.create(username='Test2', password='test2')
+        self.user2 = User.objects.create(username='Test2', password='test2')
+        user3 = User.objects.create(username='Test3', password='test3')
+        self.post = Post.objects.create(title='title2', text='text2', user=self.user2)
 
-        post1 = Post.objects.create(title='title1', text='text1', user=self.user)
-        self.post = Post.objects.create(title='title2', text='text2', user=user2)
-
-        self.subscribe = Subscribe.objects.create(user=self.user, post=self.post)
-        Subscribe.objects.create(user=user2, post=post1)
+        self.subscribe = Subscribe.objects.create(user=self.user, user_to=self.user2)
+        Subscribe.objects.create(user=self.user2, user_to=user3)
 
     def test_delete_subscribe(self):
-        id_ = self.post.id
+        id_ = self.user2.id
         response = self.client.delete(
             f'http://127.0.0.1:8000/api/v1/subscribe/{id_}/')
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        subscribe = Subscribe.objects.filter(post__id=self.post.id)
+        subscribe = Subscribe.objects.filter(user_to__id=self.user2.id)
         self.assertEqual(len(subscribe), 0)
