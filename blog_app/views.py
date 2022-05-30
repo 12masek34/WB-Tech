@@ -150,9 +150,8 @@ class ListSubscribeAPIView(generics.ListAPIView):
 
 class MarkPostByReadedAPIView(generics.RetrieveAPIView):
     """
-    Read post by authorized user.\n
-    Read post and mark by read. (In field read_by add authorized user).
-    Read post authorized user by pk user in url parameter.
+    Mark post by authorized user.\n
+    Mark by read post. In field read_by add authorized user in url parameter.
     Example url: /1/
     """
     queryset = Post.objects.all()
