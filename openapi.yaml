@@ -41,6 +41,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/PostCreate'
       x-codegen-request-body-name: data
+  /post/{id}/:
+    get:
+      tags:
+        - post
+      summary: Mark post by authorized user.
+      description: >-
+        Mark by read post. In field read_by add authorized user in url
+        parameter.
+
+        Example url: /1/
+      operationId: post_read
+      parameters:
+        - name: id
+          in: path
+          description: A unique integer value identifying this post.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
   /posts/:
     get:
       tags:
@@ -52,15 +77,37 @@ paths:
 
         Sort by post creation date, fresh first.
       operationId: posts_list
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
       responses:
         '200':
           description: ''
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Post'
+                required:
+                  - count
+                  - results
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  next:
+                    type: string
+                    format: uri
+                    nullable: true
+                  previous:
+                    type: string
+                    format: uri
+                    nullable: true
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Post'
   /registration/:
     post:
       tags:
@@ -95,7 +142,7 @@ paths:
             schema:
               type: object
               properties:
-                post:
+                user_to:
                   type: integer
         required: true
       responses:
@@ -106,41 +153,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/CreateSubscribeResponse'
       x-codegen-request-body-name: data
-    patch:
-      tags:
-        - subscribe
-      summary: Marks the post as read.
-      description: Update subscribe authorized user by pk post.
-      operationId: subscribe_partial_update
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                post:
-                  type: integer
-                  description: Id of the selected post
-        required: true
-      responses:
-        '200':
-          description: response description
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Subscribe'
-      x-codegen-request-body-name: data
-  /subscribe/{post_id}/:
+  /subscribe/{user_to}/:
     delete:
       tags:
         - subscribe
       summary: Delete subscribe.
       description: |-
-        Delete subscribe authorized user by pk post in url parameter.
-        Example url: http://127.0.0.1:8000/api/v1/subscribe/1/
+        Delete subscribe authorized user by pk user in url parameter.
+        Example url: /1/
       operationId: subscribe_delete
       parameters:
-        - name: post_id
+        - name: user_to
           in: path
           required: true
           schema:
@@ -149,13 +172,16 @@ paths:
         '204':
           description: ''
           content: {}
-  /subscribers/:
+  /subscribers/posts/:
     get:
       tags:
         - subscribers
       summary: All posts from subscribers' feed
-      description: List subscribes by user.Sort by post creation date, fresh first.
-      operationId: subscribers_list
+      description: |-
+        List post for subscribe users. Sort by post creation date, fresh first.
+        Filer by query parameter readed boolean type.
+        Example filter param: /?readed=true
+      operationId: subscribers_posts_list
       parameters:
         - name: page
           in: query
@@ -164,7 +190,7 @@ paths:
             type: integer
         - name: readed
           in: query
-          description: filter by readed.
+          description: filter by readed parameter (boolean type).
           schema:
             type: boolean
       responses:
@@ -191,7 +217,7 @@ paths:
                   results:
                     type: array
                     items:
-                      $ref: '#/components/schemas/PostSubscribe'
+                      $ref: '#/components/schemas/Post'
   /token/:
     post:
       tags:
@@ -380,47 +406,20 @@ components:
             only.
     CreateSubscribeResponse:
       required:
-        - post
         - user
+        - user_to
       type: object
       properties:
         id:
           title: ID
           type: integer
           readOnly: true
-        post:
-          title: Post
+        user_to:
+          title: User to
           type: integer
         user:
           title: User
           type: integer
-    Subscribe:
-      type: object
-      properties:
-        id:
-          title: ID
-          type: integer
-          readOnly: true
-        post:
-          $ref: '#/components/schemas/Post'
-        user:
-          title: User
-          type: integer
-        readed:
-          title: Readed
-          type: boolean
-    PostSubscribe:
-      type: object
-      properties:
-        id:
-          title: ID
-          type: integer
-          readOnly: true
-        post:
-          $ref: '#/components/schemas/Post'
-        readed:
-          title: Readed
-          type: boolean
     TokenObtainPair:
       required:
         - password
