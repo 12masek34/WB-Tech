@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from blog_app.models import Post
+from ..exception import APIException
 
 
 class CreateSubscribeTest(APITestCase):
@@ -42,6 +42,10 @@ class CreateSubscribeTest(APITestCase):
             'user_to': users[1].id
         }
         self.subscribe3 = {}
+
+        self.subscribe4 = {
+            'user_to': self.user.id
+        }
 
     def test_create_subscribe(self):
         response = self.client.post(
@@ -82,3 +86,12 @@ class CreateSubscribeTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response.json(), {'detail': 'Authentication credentials were not provided.'})
+
+    def test_create_subscribe_in_self(self):
+        response = self.client.post(
+            'http://127.0.0.1:8000/api/v1/subscribe/',
+            data=json.dumps(self.subscribe4),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.json(), {'detail': APIException.subscribe_to_self})

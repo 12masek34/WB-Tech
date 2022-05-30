@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework import generics, permissions, status, mixins
-from rest_framework.exceptions import APIException
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
@@ -10,6 +9,7 @@ from .models import Post, Subscribe
 from .serializers import (PostCreateSerializer, PostSerializer,
                           CreateSubscribeSerializer, CreateSubscribeResponseSerializer)
 from .paginations import MyPagination
+from .exception import APIException
 
 
 class CreatePostAPIView(generics.CreateAPIView):
@@ -80,7 +80,7 @@ class CreateSubscribeUserAPIView(generics.CreateAPIView):
     def perform_create(self, serializer):
         user_to = get_object_or_404(get_user_model(), id=self.request.data.get('user_to'))
         if user_to == self.request.user:
-            raise APIException('Do you want to subscribe to yourself.')
+            raise APIException(detail=APIException.subscribe_to_self)
         serializer = self.get_serializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -143,8 +143,7 @@ class ListSubscribeAPIView(generics.ListAPIView):
             return Post.objects.filter(user__id__in=subscribe_user_id).exclude(read_by=self.request.user.id).order_by(
                 '-created_at')
         else:
-            raise APIException(
-                f'Parameter "readed" must be true on false. But not {self.request.query_params.get("readed")}')
+            raise APIException(detail=APIException.readed_parameter)
 
 
 class MarkPostByReadedAPIView(generics.RetrieveAPIView):
