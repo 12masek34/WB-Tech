@@ -64,8 +64,6 @@ class CreateSubscribeUserAPIView(generics.CreateAPIView):
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return CreateSubscribeSerializer
-        # if self.request.method == 'PATCH':
-        #     return SubscribeSerializer
 
     @swagger_auto_schema(request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
@@ -88,41 +86,12 @@ class CreateSubscribeUserAPIView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
-    #
-    # @swagger_auto_schema(request_body=openapi.Schema(
-    #     type=openapi.TYPE_OBJECT,
-    #     properties={
-    #         'post': openapi.Schema(type=openapi.TYPE_INTEGER, description='Id of the selected post'),
-    #     }),
-    #     responses={
-    #         status.HTTP_200_OK: openapi.Response(
-    #             description="response description",
-    #             schema=SubscribeSerializer,
-    #         )
-    #     }
-    # )
-    # def patch(self, request, *args, **kwargs):
-    #     """
-    #     Marks the post as read.\n
-    #     Update subscribe authorized user by pk post.
-    #     """
-    #     return self.update(request, *args, **kwargs)
-    #
-    # def get_object(self, post_id: int, user):
-    #     return get_object_or_404(Subscribe, user=user, post=post_id)
-    #
-    # def update(self, request, *args, **kwargs):
-    #     partial = kwargs.pop('partial', False)
-    #     instance = self.get_object(request.data.get('post'), request.user)
-    #     serializer = self.get_serializer(instance, data=request.data, partial=partial)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_update(serializer)
-    #     return Response(serializer.data)
 
 
 class DeleteSubscribeUserAPIView(generics.GenericAPIView, mixins.DestroyModelMixin):
     """
-    Delete subscribe authorized user by pk post.
+    Delete subscribe.\n
+    Delete subscribe authorized user by id user.
     """
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -132,8 +101,8 @@ class DeleteSubscribeUserAPIView(generics.GenericAPIView, mixins.DestroyModelMix
     def delete(self, request, user_to: int, *args, **kwargs):
         """
         Delete subscribe.\n
-        Delete subscribe authorized user by pk post in url parameter.
-        Example url: http://127.0.0.1:8000/api/v1/subscribe/1/
+        Delete subscribe authorized user by pk user in url parameter.
+        Example url: /1/
         """
         subscribe = self.get_object(user_to, request.user)
         subscribe.delete()
@@ -143,18 +112,18 @@ class DeleteSubscribeUserAPIView(generics.GenericAPIView, mixins.DestroyModelMix
 class ListSubscribeAPIView(generics.ListAPIView):
     """
     All posts from subscribers' feed\n
-    List subscribes by user.Sort by post creation date, fresh first.
+    List post for subscribe users. Sort by post creation date, fresh first.
+    Filer by query parameter readed boolean type.
+    Example filter param: /?readed=true
     """
     serializer_class = PostSerializer
     permission_classes = (permissions.IsAuthenticated,)
     pagination_class = MyPagination
-    filter_backends = (DjangoFilterBackend,)
-
-    # filterset_fields = ('readed',)
 
     @swagger_auto_schema(
-        manual_parameters=[openapi.Parameter('readed', openapi.IN_QUERY, description='filter by readed.',
-                                             type=openapi.TYPE_BOOLEAN)])
+        manual_parameters=[
+            openapi.Parameter('readed', openapi.IN_QUERY, description='filter by readed parameter (boolean type).',
+                              type=openapi.TYPE_BOOLEAN)])
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
@@ -164,45 +133,34 @@ class ListSubscribeAPIView(generics.ListAPIView):
         for sub in subscibers:
             subscribe_user_id.append(sub.user_to.id)
 
-        posts = Post.objects.filter(user__id__in=subscribe_user_id).order_by('-created_at')
-        return posts
+        if not self.request.query_params:
+            return Post.objects.filter(user__id__in=subscribe_user_id).order_by('-created_at')
+        elif self.request.query_params.get('readed') == 'true':
+
+            return Post.objects.filter(user__id__in=subscribe_user_id, read_by=self.request.user.id).order_by(
+                '-created_at')
+
+        elif self.request.query_params.get('readed') == 'false':
+            return Post.objects.filter(user__id__in=subscribe_user_id).exclude(read_by=self.request.user.id).order_by(
+                '-created_at')
+        else:
+            raise APIException(
+                f'Parameter "readed" must be true on false. But not {self.request.query_params.get("readed")}')
 
 
-class MarkPostHowViewAPIView(generics.GenericAPIView, mixins.UpdateModelMixin):
+class MarkPostByReadedAPIView(generics.RetrieveAPIView):
+    """
+    Read post by authorized user.\n
+    Read post and mark by read. (In field read_by add authorized user).
+    Read post authorized user by pk user in url parameter.
+    Example url: /1/
+    """
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-    # @swagger_auto_schema(request_body=openapi.Schema(
-    #     type=openapi.TYPE_OBJECT,
-    #     properties={
-    #         'post': openapi.Schema(type=openapi.TYPE_INTEGER, description='Id of the selected post'),
-    #     }),
-    #     responses={
-    #         status.HTTP_200_OK: openapi.Response(
-    #             description="response description",
-    #             schema=SubscribeSerializer,
-    #         )
-    #     }
-    # )
-    def patch(self, request, *args, **kwargs):
-        """
-        Marks the post as read.\n
-        Update subscribe authorized user by pk post.
-        """
-        return self.update(request, *args, **kwargs)
-
-    def get_object(self, post_id: int, user):
-        return get_object_or_404(CheckPost, post=post_id, user=user)
-
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object(request.data.get('post'), request.user)
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.read_by.add(request.user)
+        serializer = self.get_serializer(instance)
         return Response(serializer.data)
-
-        # users_to = [user.user_to.id for user in subscibers]
-        # posts = Post.objects.filter(user__in=users_to).order_by('-created_at')
-        # return posts
-
-        # return Post.objects.filter(user=self.request.user).order_by('-user_to__created_at')
