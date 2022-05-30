@@ -24,18 +24,6 @@ class PostSerializer(PostCreateSerializer):
         fields = ('id',) + PostCreateSerializer.Meta.fields + ('created_at',)
 
 
-class PostSubscribeSerializer(serializers.ModelSerializer):
-    """
-    All subscribe by user.
-    """
-    post = PostSerializer(read_only=True, many=True)
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), )
-
-    class Meta:
-        model = Subscribe
-        fields = ('id', 'post', 'user')
-
-
 class CreateSubscribeSerializer(serializers.ModelSerializer):
     """
     Create subscribe serializer.
@@ -53,23 +41,6 @@ class CreateSubscribeSerializer(serializers.ModelSerializer):
             user_to=user_to,
             **validated_data
         )
-        return instance
-
-
-class SubscribeSerializer(serializers.ModelSerializer):
-    """
-    Subscribe by user.
-    """
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), default=serializers.CurrentUserDefault())
-    post = PostSerializer(read_only=True)
-
-    class Meta:
-        model = Subscribe
-        fields = ('id', 'post', 'user', 'readed')
-
-    def update(self, instance, validated_data):
-        instance.readed = True
-        instance.save()
         return instance
 
 

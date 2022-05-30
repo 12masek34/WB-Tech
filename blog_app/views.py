@@ -1,6 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Count
-from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework import generics, permissions, status, mixins
@@ -8,8 +6,8 @@ from rest_framework.exceptions import APIException
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from .models import Post, Subscribe, CheckPost
-from .serializers import (PostCreateSerializer, PostSerializer, SubscribeSerializer, PostSubscribeSerializer,
+from .models import Post, Subscribe
+from .serializers import (PostCreateSerializer, PostSerializer,
                           CreateSubscribeSerializer, CreateSubscribeResponseSerializer)
 from .paginations import MyPagination
 
@@ -47,6 +45,7 @@ class ListAllPostsAPIVew(generics.ListAPIView):
     """
     serializer_class = PostSerializer
     permission_classes = (permissions.AllowAny,)
+    pagination_class = MyPagination
 
     def get_queryset(self):
         if self.request.user.is_anonymous:
