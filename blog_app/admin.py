@@ -12,7 +12,7 @@ class PostAdmin(admin.ModelAdmin):
 
 
 class SubscribeAdmin(admin.ModelAdmin):
-    list_display = ('user', 'user_to')
+    list_display = ('user_to', 'user',)
 
 
 admin.site.register(Post, PostAdmin)

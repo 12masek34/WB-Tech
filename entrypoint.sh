@@ -12,8 +12,8 @@ then
 fi
 
 python manage.py flush --no-input
-python manage.py makemigrations
-sleep 20
+python python manage.py makemigrations blog_app
+sleep 10
 python manage.py migrate
 
 exec "$@"
