@@ -128,19 +128,19 @@ class ListSubscribeAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         subscibers = Subscribe.objects.filter(user=self.request.user).select_related('user_to')
-        subscribe_user_id = []
+        ids = []
         for sub in subscibers:
-            subscribe_user_id.append(sub.user_to.id)
+            ids.append(sub.user_to.id)
 
         if not self.request.query_params:
-            return Post.objects.filter(user__id__in=subscribe_user_id).order_by('-created_at')
+            return Post.objects.filter(user__id__in=ids).order_by('-created_at')
         elif self.request.query_params.get('readed') == 'true':
 
-            return Post.objects.filter(user__id__in=subscribe_user_id, read_by=self.request.user.id).order_by(
+            return Post.objects.filter(user__id__in=ids, read_by=self.request.user.id).order_by(
                 '-created_at')
 
         elif self.request.query_params.get('readed') == 'false':
-            return Post.objects.filter(user__id__in=subscribe_user_id).exclude(read_by=self.request.user.id).order_by(
+            return Post.objects.filter(user__id__in=ids).exclude(read_by=self.request.user.id).order_by(
                 '-created_at')
         else:
             raise APIException(detail=APIException.readed_parameter)
