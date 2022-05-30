@@ -134,8 +134,8 @@ class ListSubscribeAPIView(generics.ListAPIView):
 
         if not self.request.query_params:
             return Post.objects.filter(user__id__in=ids).order_by('-created_at')
-        elif self.request.query_params.get('readed') == 'true':
 
+        elif self.request.query_params.get('readed') == 'true':
             return Post.objects.filter(user__id__in=ids, read_by=self.request.user.id).order_by(
                 '-created_at')
 
