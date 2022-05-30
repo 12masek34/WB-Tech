@@ -1,12 +1,13 @@
 from django.urls import path
 
-from .views import (CreatePostAPIView, ListAllPostsAPIVew, CreateOrUpdateSubscribeUserAPIView,
-                    DeleteSubscribeUserAPIView, ListSubscribeAPIView)
+from .views import (CreatePostAPIView, ListAllPostsAPIVew, CreateSubscribeUserAPIView,
+                    DeleteSubscribeUserAPIView, ListSubscribeAPIView, MarkPostHowViewAPIView)
 
 urlpatterns = [
     path('post/', CreatePostAPIView.as_view()),
     path('posts/', ListAllPostsAPIVew.as_view()),
-    path('subscribe/', CreateOrUpdateSubscribeUserAPIView.as_view()),
-    path('subscribe/<int:post_id>/', DeleteSubscribeUserAPIView.as_view()),
-    path('subscribers/', ListSubscribeAPIView.as_view()),
+    path('subscribe/', CreateSubscribeUserAPIView.as_view()),
+    path('subscribe/', MarkPostHowViewAPIView.as_view()),
+    path('subscribe/<int:user_to>/', DeleteSubscribeUserAPIView.as_view()),
+    path('subscribers/posts/', ListSubscribeAPIView.as_view()),
 ]

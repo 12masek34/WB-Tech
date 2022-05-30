@@ -13,9 +13,14 @@ class Post(models.Model):
 
 
 class Subscribe(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    readed = models.BooleanField(default=False)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='who')
+    user_to = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('user', 'post',)
+        unique_together = ('user', 'user_to',)
+
+
+class CheckPost(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    post = models.OneToOneField(Post, on_delete=models.CASCADE)
+    readed = models.BooleanField(default=False)

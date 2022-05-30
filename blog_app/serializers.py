@@ -28,11 +28,12 @@ class PostSubscribeSerializer(serializers.ModelSerializer):
     """
     All subscribe by user.
     """
-    post = PostSerializer(read_only=True)
+    post = PostSerializer(read_only=True, many=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), )
 
     class Meta:
         model = Subscribe
-        fields = ('id', 'post', 'readed')
+        fields = ('id', 'post', 'user')
 
 
 class CreateSubscribeSerializer(serializers.ModelSerializer):
@@ -40,15 +41,16 @@ class CreateSubscribeSerializer(serializers.ModelSerializer):
     Create subscribe serializer.
     """
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), default=serializers.CurrentUserDefault())
+    user_to = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
     class Meta:
         model = Subscribe
-        fields = ('id', 'post', 'user')
+        fields = ('id', 'user', 'user_to')
 
     def create(self, validated_data):
-        post = validated_data.pop('post')
+        user_to = validated_data.pop('user_to')
         instance = Subscribe.objects.create(
-            post=post,
+            user_to=user_to,
             **validated_data
         )
         return instance
@@ -75,6 +77,7 @@ class SubscribeResponseSerializer(serializers.ModelSerializer):
     """
     Only for the  openapi scheme.
     """
+
     class Meta:
         model = Subscribe
         fields = ('id', 'user', 'post', 'readed')
@@ -84,6 +87,7 @@ class CreateSubscribeResponseSerializer(serializers.ModelSerializer):
     """
     Only for the  openapi scheme.
     """
+
     class Meta:
         model = Subscribe
-        fields = ('id', 'post', 'user')
+        fields = ('id', 'user_to', 'user')
